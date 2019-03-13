@@ -11,38 +11,69 @@ end
 x_Thr_low = xfit(1);
 x_Thr = xfit(2);
 
+%% Binning can be done either with equal intervals or with equal number of items in each bin (~ 20 bins)
 % Divide the data into bins with required bin size and calculate the
 % mean values of the parameter in the bin
-binsize = 0.5;
-x_ecc = (x_Thr_low:binsize:x_Thr)';
-i=1;
-bin_idx = nan(size(x_param));
+
+
+bin_type = 'Eq_size';
 x_bin = struct();
 y_bin = struct();
 w_bin = struct();
-for b=x_Thr_low:binsize:x_Thr
-    bii = x_param >  b-binsize./2 & x_param <= b+binsize./2;
-    if any(bii),
-        % weighted mean of sigma
-        s = wstat(y_param(bii),w(bii));
-        % store
-        ii2 = find(x_ecc==b);
-        data.y(ii2) = s.mean;
-        data.ysterr(ii2) = s.sterr;
-        data.x(ii2) = x_ecc(ii2);
-
-        bin_idx(bii) = b;
-        % values inside the bins
-        y_bin(i).data = y_param(bii);
-        x_bin(i).data = x_param(bii);
-        w_bin(i).data = w(bii);
-        i=i+1;
-    else
-        fprintf(1,'[%s]:Warning:No data in eccentricities %.1f to %.1f.\n',...
-            mfilename,b-binsize./2,b+binsize./2);
-    end
-    
+switch bin_type
+    %----- Binning with equal intervals -----%
+    case {'Eq_interval'}
+        binsize = 0.5;
+        x_ecc = (x_Thr_low:binsize:x_Thr)';
+        i=1;
+        bin_idx = nan(size(x_param));
+        for b=x_Thr_low:binsize:x_Thr
+            bii = x_param >  b-binsize./2 & x_param <= b+binsize./2;
+            if any(bii),
+                % weighted mean of sigma
+                s = wstat(y_param(bii),w(bii));
+                % store
+                ii2 = find(x_ecc==b);
+                data.y(ii2) = s.mean;
+                data.ysterr(ii2) = s.sterr;
+                data.x(ii2) = x_ecc(ii2);
+                
+                bin_idx(bii) = b;
+                % values inside the bins
+                y_bin(i).data = y_param(bii);
+                x_bin(i).data = x_param(bii);
+                w_bin(i).data = w(bii);
+                i=i+1;
+            else
+                fprintf(1,'[%s]:Warning:No data in eccentricities %.1f to %.1f.\n',...
+                    mfilename,b-binsize./2,b+binsize./2);
+            end
+            
+        end
+        
+    case {'Eq_size'}
+        % ----- Binning with equal percentile of data in each bin ----- %
+        
+        num_bin = 20;
+        bins = ceil(num_bin*tiedrank(x_param)./length(x_param));
+        for idx_bin = 1:num_bin
+            
+            bii = (bins==idx_bin);
+            
+            x_bin(idx_bin).data = x_param(bins==idx_bin);
+            y_bin(idx_bin).data = y_param(bins==idx_bin);
+            w_bin(idx_bin).data = w(bins==idx_bin);
+            
+            % weighted mean of sigma
+            s = wstat(y_param(bii),w(bii));
+            % store
+            data.y(idx_bin) = s.mean;
+            data.ysterr(idx_bin) = s.sterr;
+            data.x(idx_bin) = mean(x_bin(idx_bin).data(:));
+        end
+        
 end
+%%
 
 boottype='bin';
 % Bootstrap the data  and calculate the error margins

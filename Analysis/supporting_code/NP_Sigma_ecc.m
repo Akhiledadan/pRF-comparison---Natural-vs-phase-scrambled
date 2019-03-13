@@ -19,6 +19,7 @@ Ecc_Thr_low = 0.5;
 Mean_map_Thr = 1000;
 
 % Select the ROIs
+
 %ROI_choice_all = [{'V1'};{'V2'};{'V3'};{'V3A'};{'V3B'};{'LO1'};{'LO2'}];
 ROI_choice_all = [{'V1'};{'V2'};{'V3'}];
 
@@ -55,6 +56,10 @@ for cond_idx = 1:length(conditions)
         warning('more than one model fit, selecting the latest one. Select a different model otherwise')
         % Update this with a code to determine the date of model and
         % selecting the latest
+        tmp = model_fname;
+        model_fname = [];
+        model_fname = getlatestmodel(tmp);
+        
     end
     
     model_file{cond_idx,1} = fullfile(paths.model_path_ind,model_fname.name);
@@ -109,7 +114,7 @@ for roi_idx = 1:num_roi
         
         % For every condition and roi, save the index_thr and add them to
         % the Cond_model table so that they can be loaded later
-        index_thr_tmp{cond_idx,1} = model_data{1}.varexp > Var_Exp_Thr & model_data{1}.ecc < Ecc_Thr & model_data{1}.ecc > Ecc_Thr_low & mean_map > Mean_map_Thr;
+        index_thr_tmp{cond_idx,1} = model_data{cond_idx}.varexp > Var_Exp_Thr & model_data{cond_idx}.ecc < Ecc_Thr & model_data{cond_idx}.ecc > Ecc_Thr_low & mean_map > Mean_map_Thr;
         
     end
     
@@ -213,7 +218,7 @@ for roi_idx = 1:num_roi
             yaxislim = [0 5];
             
             % x range values for fitting
-            xfit = [Ecc_Thr_low Ecc_Thr];
+            xfit_range = [Ecc_Thr_low Ecc_Thr];
             
         case 'Pol_Sig'
             x_param_comp_1 = Cond_model{1,roi_comp}{1}.pol;
@@ -229,7 +234,7 @@ for roi_idx = 1:num_roi
             % x range values for fitting
             Pol_Thr_low = 0;
             Pol_Thr = 2*pi;
-            xfit = [Pol_Thr_low Pol_Thr];
+            xfit_range = [Pol_Thr_low Pol_Thr];
             
         case 'X_Sig'
             x_param_comp_1 = Cond_model{1,roi_comp}{1}.x;
@@ -271,8 +276,9 @@ for roi_idx = 1:num_roi
     fprintf('\n Calculating slope and intercept for the best fitting line for the conditions for roi %d \n',roi_idx)
     
     % Do a linear regression of the two parameters weighted with the variance explained    
-    [param_comp_1_yfit,xfit_plot] = NP_fit(x_param_comp_1,y_param_comp_1,Cond_model{1,roi_comp}{1}.varexp,xfit);
-    [param_comp_2_yfit,~] = NP_fit(x_param_comp_2,y_param_comp_2,Cond_model{2,roi_comp}{1}.varexp,xfit);
+    xfit = linspace(xfit_range(1),xfit_range(2),8)'; 
+    [param_comp_1_yfit] = NP_fit(x_param_comp_1,y_param_comp_1,Cond_model{1,roi_comp}{1}.varexp,xfit);
+    [param_comp_2_yfit] = NP_fit(x_param_comp_2,y_param_comp_2,Cond_model{2,roi_comp}{1}.varexp,xfit);
     
     % Plot the fit line 
     figPoint_fit = figure(2);
@@ -330,7 +336,8 @@ for roi_idx = 1:num_roi
     param_comp_diff_data_cen_allroi(roi_idx) = param_comp_2_data_cen.y - param_comp_1_data_cen.y;  
     
     
-    
+%% Calculate the difference between the sigma values and then calculate the central values
+
     % Calculate the difference between sigma values, bin them and bootstrap across bins  
     assertEqual(x_param_comp_1,x_param_comp_2);
     x_param_comp = x_param_comp_1;
