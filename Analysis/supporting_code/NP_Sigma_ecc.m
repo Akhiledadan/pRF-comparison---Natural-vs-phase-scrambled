@@ -19,8 +19,8 @@ Ecc_Thr_low = 0.5;
 Mean_map_Thr = 1000;
 
 % Select the ROIs
-ROI_choice_all = [{'V1'};{'V2'};{'V3'};{'V3A'};{'V3B'};{'LO1'};{'LO2'}];
-
+%ROI_choice_all = [{'V1'};{'V2'};{'V3'};{'V3A'};{'V3B'};{'LO1'};{'LO2'}];
+ROI_choice_all = [{'V1'};{'V2'};{'V3'}];
 
 % pRF parameters to be compared
 if ~exist('plot_type','var') || isempty(plot_type)
