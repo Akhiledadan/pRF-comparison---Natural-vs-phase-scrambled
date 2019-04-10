@@ -13,7 +13,7 @@ function NP_Sigma_ecc(main_dir,save_results,save_plots,plot_type)
 MarkerSize = 6;
 
 % Model thresholds
-Var_Exp_Thr = 0.4;
+Var_Exp_Thr = 0.01;
 Ecc_Thr = 4;
 Ecc_Thr_low = 0.5;
 Mean_map_Thr = 1000;
@@ -112,6 +112,15 @@ for roi_idx = 1:num_roi
         % Current model parameters- contains x,y, sigma,
         model_data(cond_idx,1) = GetInfoModel(Cond_model.model_file{cond_idx},coordsFile,ROI_params.roi_fname{roi_idx});
         
+        rm = load(Cond_model.model_file{cond_idx});
+        if strcmp(rm.model{1}.description,'Difference 2D pRF fit (x,y,sigma,sigma2, center=positive)')
+            [fwhmax,surroundSize,fwhmin_first, fwhmin_second, diffwhmin] = rmGetDoGFWHM(rm.model{1},[]);
+            model_data{cond_idx,1}.DoGs_fwhmax = fwhmax;
+            model_data{cond_idx,1}.DoGs_surroundSize = surroundSize;
+            model_data{cond_idx,1}.DoGs_fwhmin_first = fwhmin_first;
+            model_data{cond_idx,1}.DoGs_fwhmin_second = fwhmin_second;
+            model_data{cond_idx,1}.DoGs_diffwhmin = diffwhmin;
+        end
         % For every condition and roi, save the index_thr and add them to
         % the Cond_model table so that they can be loaded later
         index_thr_tmp{cond_idx,1} = model_data{cond_idx}.varexp > Var_Exp_Thr & model_data{cond_idx}.ecc < Ecc_Thr & model_data{cond_idx}.ecc > Ecc_Thr_low & mean_map > Mean_map_Thr;
@@ -212,6 +221,21 @@ for roi_idx = 1:num_roi
             
             y_param_comp_1 = Cond_model{1,roi_comp}{1}.sigma;
             y_param_comp_2 = Cond_model{2,roi_comp}{1}.sigma;
+            
+            % Axis limits for plotting
+            xaxislim = [0 5];
+            yaxislim = [0 5];
+            
+            % x range values for fitting
+            xfit_range = [Ecc_Thr_low Ecc_Thr];
+            
+            
+        case 'Ecc_SurSize_DoGs'
+            x_param_comp_1 = Cond_model{1,roi_comp}{1}.ecc;
+            x_param_comp_2 = Cond_model{2,roi_comp}{1}.ecc;
+            
+            y_param_comp_1 = Cond_model{1,roi_comp}{1}.DoGs_surroundSize;
+            y_param_comp_2 = Cond_model{2,roi_comp}{1}.DoGs_surroundSize;
             
             % Axis limits for plotting
             xaxislim = [0 5];

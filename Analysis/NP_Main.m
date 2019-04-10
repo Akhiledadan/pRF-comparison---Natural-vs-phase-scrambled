@@ -1,4 +1,5 @@
 
+
 % Folders for defining mrSESSION
 NP_init_directory_structure;
 
@@ -102,8 +103,10 @@ hvol = viewSet(hvol,'curdt','pRF_all');
 %hvol = viewSet(hvol,'roi','V1.mat');
 
 % Load the stimulus parameters
-figpoint = rmEditStimParams(hvol);
-uiwait(figpoint);
+%figpoint = rmEditStimParams(hvol);
+%uiwait(figpoint);
+
+hvol = rmLoadParameters(hvol);hvol=refreshScreen(hvol);
 
 fprintf('\n Starting the pRF fitting with hrf for One Gaussian and Difference of gaussians \n');
 
