@@ -28,15 +28,15 @@ params.analysis.allstimimages = double(params.analysis.allstimimages);
 
 % Define the upper and lower values of the sigma1 and sigma2 to create the
 % search space.
-s1.min = min(range.lower(3,:));
-s1.max = min(range.upper(3,:));
-s2.min = min(range.lower(4,:));
-s2.max = min(range.upper(4,:));
+% s1.min = min(range.lower(3,:));
+% s1.max = min(range.upper(3,:));
+% s2.min = min(range.lower(4,:));
+% s2.max = min(range.upper(4,:));
 nSigmas = 24;
 
-% Create the grid 
-s1.sigmaValues = linspace(s1.min,s1.max,nSigmas); % For positive gaussian 
-s2.sigmaValues = linspace(s2.min,s2.max,nSigmas); % For negative gaussian
+% % Create the grid 
+% s1.sigmaValues = linspace(s1.min,s1.max,nSigmas); % For positive gaussian 
+% s2.sigmaValues = linspace(s2.min,s2.max,nSigmas); % For negative gaussian
 
 % Set the min RSS for every voxel to be the RSS value obtained from the all
 % fit. If the RSS is above for the best fitting voxel, retain this value
@@ -96,20 +96,25 @@ for ii = 1:numel(wProcess),
     
     % compute part of the pRF computations related to position (x,y) here
     % for speed reasons
-    Xv = params.analysis.X-range.start(1);
-    Yv = params.analysis.Y-range.start(2);
+    Xv = params.analysis.X-range.start(1,vi);
+    Yv = params.analysis.Y-range.start(2,vi);
     XvYv = (Yv.*Yv + Xv.*Xv);
     
+    % Create the grid
+    s1.sigmaValues = linspace(range.lower(3,vi),range.upper(3,vi),nSigmas); % For positive gaussian
+    s2.sigmaValues = linspace(range.lower(4,vi),range.upper(4,vi),nSigmas); % For negative gaussian
     
     
     
     
 
 for s1_idx = s1.sigmaValues
-    for s2_idx = s2.sigmaValues
+    tmp_s2 = s2.sigmaValues;
+    tmp_s2 = tmp_s2(s2.sigmaValues>=2*s1_idx);
+    for s2_idx = tmp_s2
         [rss_iter,b] = rmModelGridFit_twoGaussiansDoGSigmasOnly([s1_idx,s2_idx],vData,XvYv,params.analysis.allstimimages,trends);
         
-        if rss_iter < minrss(vi) & s2_idx >= 2 * s1_idx & b(1)>0 & b(1)>-b(2) & b(2)<=0
+        if rss_iter < minrss(vi)   % & s2_idx >= 2 * s1_idx
             model.s(vi)        = s1_idx;
             model.s_major(vi)        = s1_idx;
             model.s_minor(vi)        = s1_idx;

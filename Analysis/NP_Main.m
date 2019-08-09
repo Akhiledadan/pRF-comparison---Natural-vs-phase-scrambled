@@ -157,7 +157,11 @@ hrf{2} = hvol.rm.retinotopyParams.stim.hrfParams(2);
 % Run the model fit for only sigma alone
 hvol = rmMain(hvol,[],7,'matFileName','nat_refined_DoGs','hrf',hrf,'model',prfModels,'refine','sigma');
 
-
+%To test ona small ROI
+test_roi = 1;
+if test_roi
+    hvol = rmMain(hvol,'V1',7,'matFileName','nat_refined_DoGs','hrf',hrf,'model',prfModels,'refine','sigma');
+end
 %%  Refined sigma fit for difference of gaussians fit for scrambled condition
 
 if ~exist('hvol','var')

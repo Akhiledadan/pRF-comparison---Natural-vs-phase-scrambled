@@ -1,0 +1,53 @@
+3dTcat pb02.motionCorrect.r01.volreg+orig -prefix pRF1_N+orig
+3dTcat pb02.motionCorrect.r02.volreg+orig -prefix pRF2_N+orig
+3dTcat pb02.motionCorrect.r03.volreg+orig -prefix pRF3_N+orig
+3dTcat pb02.motionCorrect.r04.volreg+orig -prefix pRF4_P+orig
+3dTcat pb02.motionCorrect.r05.volreg+orig -prefix pRF5_P+orig
+3dTcat pb02.motionCorrect.r06.volreg+orig -prefix pRF6_P+orig
+
+
+
+3dTcat pb02.motionCorrect.r07.volreg+orig -prefix pRF7_P+orig
+3dTcat pb02.motionCorrect.r08.volreg+orig -prefix pRF8_P+orig
+
+3dAFNItoNIFTI pRF1_N+orig
+3dAFNItoNIFTI pRF2_N+orig
+3dAFNItoNIFTI pRF3_N+orig
+3dAFNItoNIFTI pRF4_P+orig
+3dAFNItoNIFTI pRF5_P+orig
+3dAFNItoNIFTI pRF6_P+orig
+
+
+3dAFNItoNIFTI pRF7_P+orig
+3dAFNItoNIFTI pRF8_P+orig
+
+# Average similar scans together
+3dMean -prefix nifti/Average/meanTs_all.nii.gz nifti/*.nii
+3dMean -prefix nifti/Average/meanTs_N.nii.gz nifti/*_N.nii
+3dMean -prefix nifti/Average/meanTs_P.nii.gz nifti/*_P.nii
+
+
+3dWarp -deoblique -prefix nifti/Average/meanTs_all_deob.nii nifti/Average/meanTs_all.nii.gz 
+3dWarp -deoblique -prefix nifti/Average/meanTs_N_deob.nii nifti/Average/meanTs_N.nii.gz
+3dWarp -deoblique -prefix nifti/Average/meanTs_P_deob.nii nifti/Average/meanTs_P.nii.gz
+
+3dAllineate -1Dmatrix_apply combined.1D -final linear -master amplitudeAnatomy_deob_mask_zp_shft_rot_al_al+orig \
+ -source EPIs_MC/nifti/Average/meanTs_all_deob.nii -prefix EPIs_MC/nifti/Average/coreg/meanTs_all_deob_reg.nii
+
+3dAllineate -1Dmatrix_apply combined.1D -final linear -master amplitudeAnatomy_deob_mask_zp_shft_rot_al_al+orig \
+ -source EPIs_MC/nifti/Average/meanTs_N_deob.nii -prefix EPIs_MC/nifti/Average/coreg/meanTs_N_deob_reg.nii
+
+3dAllineate -1Dmatrix_apply combined.1D -final linear -master amplitudeAnatomy_deob_mask_zp_shft_rot_al_al+orig \
+ -source EPIs_MC/nifti/Average/meanTs_P_deob.nii -prefix EPIs_MC/nifti/Average/coreg/meanTs_P_deob_reg.nii
+
+cd EPIs_MC/nifti/Average/coreg/
+
+3dAutobox -noclust -input meanTs_all_deob_reg.nii -prefix meanTs_all_deob_reg_clip.nii
+
+3dresample -master meanTs_all_deob_reg_clip.nii -prefix meanTs_N_deob_reg_clip.nii -inset meanTs_N_deob_reg.nii -rmode NN
+3dresample -master meanTs_all_deob_reg_clip.nii -prefix meanTs_P_deob_reg_clip.nii -inset meanTs_P_deob_reg.nii -rmode NN
+
+3dTcat meanTs_all_deob_reg_clip.nii[0] -prefix inplane+orig
+3dAFNItoNIFTI inplane+orig
+
+

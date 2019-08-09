@@ -11,7 +11,7 @@ function [e,b] = rmModelGridFit_twoGaussiansDoGSigmasOnly(p,Y,XvYv,stim,t)
 % 2006/06 SOD: wrote it.
 % 2006/12 SOD: modifications for fmincon, this is litterally called >>10000
 % times so we cut every corner possible. 
-
+% 2019/04 AE: Modified from rmGridFit_twoGaussiansDoGSigmasOnly.
 
 % make RF (taken from rfGaussian2d)
 p = -2.*(p.^2);
@@ -50,6 +50,9 @@ b = pinvX*Y;
 % b(2) = -abs(b(2));
 
 % compute residual sum of squares (e)
-e = norm(Y - X*b);
+e = inf;
+if b(1)>0 & b(1)>-b(2) & b(2)<=0
+    e = norm(Y - X*b);
+end
 
 return;
