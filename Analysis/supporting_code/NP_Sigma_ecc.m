@@ -34,7 +34,7 @@ num_cond = length(conditions);
 
 % Define the location of the files
 paths.orig_path = main_dir;
-paths.roi_path = strcat(paths.orig_path,'/Gray/ROIs/');
+paths.roi_path = strcat(paths.orig_path,'/Anatomy/ROIs/');
 paths.model_path = strcat(paths.orig_path,'/Gray/');
 paths.coords_path = strcat(paths.orig_path,'/Gray/');
 
@@ -216,6 +216,8 @@ for roi_idx = 1:num_roi
     switch plot_type
         
         case 'Ecc_Sig'
+            yAxis = 'Sigma';            
+            
             x_param_comp_1 = Cond_model{1,roi_comp}{1}.ecc;
             x_param_comp_2 = Cond_model{2,roi_comp}{1}.ecc;
             
@@ -279,19 +281,18 @@ for roi_idx = 1:num_roi
    
     fprintf('\n Plotting raw data for roi %d \n',roi_idx);
     
-    figPoint_raw = figure(1); 
-    plot(x_param_comp_1,y_param_comp_1,'b*');
-    hold on; plot(x_param_comp_2,y_param_comp_2,'g*');
-    % figure attributes
-    %titleName = strcat(Cond_model{1,1},'and',Cond_model{2,1});
+    % Plot the fit line
+    figName = sprintf('%s vs eccentricity',yAxis);
+    figPoint_fit = figure; set(gcf, 'Color', 'w', 'Position',[100 100 1920/2 1080/2], 'Name', figName); hold on;
+    plot(x_param_comp_1,y_param_comp_1,'.','color',[0.5 0.5 1],'MarkerSize',10); hold on;
+    plot(x_param_comp_2,y_param_comp_2,'.','color',[0.5 1 0.5],'MarkerSize',10); hold on;
     titleall = sprintf('%s', roi_comp) ;
     title(titleall);
-    legend([data_comp_1,data_comp_2]);
     ylim(yaxislim);
     xlim(xaxislim);
     
-    hold off;
-    fprintf('\n Done \n');
+    %hold off;
+    %fprintf('\n Done \n');
 
 %%   
     
@@ -304,31 +305,29 @@ for roi_idx = 1:num_roi
     [param_comp_1_yfit] = NP_fit(x_param_comp_1,y_param_comp_1,Cond_model{1,roi_comp}{1}.varexp,xfit);
     [param_comp_2_yfit] = NP_fit(x_param_comp_2,y_param_comp_2,Cond_model{2,roi_comp}{1}.varexp,xfit);
     
+    
+    figName = sprintf('%s vs eccentricity',yAxis);
+    figPoint_fit = figure; set(gcf, 'Color', 'w', 'Position',[100 100 1920 1080], 'Name', figName); hold on;
     % Plot the fit line 
-    figPoint_fit = figure(2);
-    plot(xfit_plot,param_comp_1_yfit','b'); hold on;
-    plot(xfit_plot,param_comp_2_yfit','g');
+    hold on;
+    plot(xfit,param_comp_1_yfit','color','b','LineWidth',2); hold on;
+    plot(xfit,param_comp_2_yfit','color','g','LineWidth',2); hold on;
     
     fprintf('Binning and bootstrapping the data for roi %d \n',roi_idx')
     
     % Bootstrap the data and bin the x parameter 
     [param_comp_1_data,param_comp_1_b_xfit,param_comp_1_b_upper,param_comp_1_b_lower] = NP_bin_param(x_param_comp_1,y_param_comp_1,Cond_model{1,roi_comp}{1}.varexp,xfit);
     [param_comp_2_data,param_comp_2_b_xfit,param_comp_2_b_upper,param_comp_2_b_lower] = NP_bin_param(x_param_comp_2,y_param_comp_2,Cond_model{2,roi_comp}{1}.varexp,xfit);
-        
-     
-    hold on;
-    plot(param_comp_1_b_xfit,param_comp_1_b_upper,'b--');
-    plot(param_comp_1_b_xfit,param_comp_1_b_lower,'b--');
-    
-    plot(param_comp_2_b_xfit,param_comp_2_b_upper,'g--');
-    plot(param_comp_2_b_xfit,param_comp_2_b_lower,'g--');
+    hold on;  
+    patch([param_comp_1_b_xfit, fliplr(param_comp_1_b_xfit)], [param_comp_1_b_lower', fliplr(param_comp_1_b_upper')], [0.3010, 0.7450, 0.9330], 'FaceAlpha', 0.5, 'LineStyle','none');
+    patch([param_comp_2_b_xfit, fliplr(param_comp_2_b_xfit)], [param_comp_2_b_lower', fliplr(param_comp_2_b_upper')], [0.4 1 0.4], 'FaceAlpha', 0.5, 'LineStyle','none');
     
     hold on;
     errorbar(param_comp_1_data.x,param_comp_1_data.y,param_comp_1_data.ysterr,'bo','MarkerFaceColor','b','MarkerSize',MarkerSize);
     errorbar(param_comp_2_data.x,param_comp_2_data.y,param_comp_1_data.ysterr,'go','MarkerFaceColor','g','MarkerSize',MarkerSize);
     titleall = sprintf('%s', roi_comp) ;
     title(titleall);
-    legend([data_comp_1,data_comp_2]);
+    legend([{data_comp_1},{data_comp_2}],'Location','northWest');
     ylim(yaxislim);
     xlim(xaxislim);
     
@@ -378,8 +377,8 @@ for roi_idx = 1:num_roi
    
     fprintf('\n Calculating the area under the curve for roi %d \n',roi_idx);
     
-    param_comp_1_auc = trapz(xfit_plot,param_comp_1_yfit);
-    param_comp_2_auc = trapz(xfit_plot,param_comp_2_yfit);
+    param_comp_1_auc = trapz(xfit,param_comp_1_yfit);
+    param_comp_2_auc = trapz(xfit,param_comp_2_yfit);
     
     figPoint_auc = figure(4);
     h = bar([param_comp_1_auc,nan],'FaceColor',[0 0 1]);hold on;
@@ -417,7 +416,7 @@ for roi_idx = 1:num_roi
     
 end
 
-close all;
+%close all;
 fprintf('Plotting the difference in central values');
 
 % Scrambled - Natural
@@ -457,7 +456,7 @@ if save_results == 1
     
 end
 
-close all;
+%close all;
 end
 
 
