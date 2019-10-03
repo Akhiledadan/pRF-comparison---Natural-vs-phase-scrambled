@@ -10,6 +10,7 @@ model_data_thr.ecc = model_data.ecc(thr_index);
 model_data_thr.latx = model_data.latx(thr_index);
 model_data_thr.laty = model_data.laty(thr_index);
 model_data_thr.beta = model_data.beta(thr_index);
+model_data_thr.betaDC = model_data.betaDC(thr_index);
 model_data_thr.varexp = model_data.varexp(thr_index);
 model_data_thr.rss = model_data.rss(thr_index);
 model_data_thr.pol = model_data.pol(thr_index);

@@ -31,6 +31,7 @@ for i = 1
     parametersData{i}.latx = rmGet(rmData.model{1}, 'latx');
     parametersData{i}.laty = rmGet(rmData.model{1}, 'laty');
     parametersData{i}.beta = rmGet(rmData.model{1}, 'beta');
+    parametersData{i}.betaDC = parametersData{i}.beta(1,:,2);
     parametersData{i}.varexp = rmGet(rmData.model{1}, 'varexp');
     parametersData{i}.rss = rmGet(rmData.model{1}, 'rss');
     parametersData{i}.pol = rmGet(rmData.model{1}, 'pol');

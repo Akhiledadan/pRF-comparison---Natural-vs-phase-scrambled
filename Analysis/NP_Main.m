@@ -77,6 +77,10 @@ end
 % for phase scrambled 
 hvol = viewSet(hvol,'curdt','pRF_scram');
 
+% Select the original model
+[model_fname, model_fpath] = uigetfile('*.mat','Select model');
+model_all = (fullfile(model_fpath, model_fname));
+
 % Load the pRF model 
 hvol = rmSelect(hvol,1,model_all);
 hrf = cell(1,2);

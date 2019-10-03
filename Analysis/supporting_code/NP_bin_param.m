@@ -1,4 +1,4 @@
-function [data,b_xfit,b_upper_plot,b_lower_plot,b_y] = NP_bin_param(x_param,y_param,w,xfit)
+function [data,b_upper_plot,b_lower_plot,b_xfit,b_y] = NP_bin_param(x_param,y_param,w,xfit,opt)
 % NP_bin_param - To divide the dependent pRF parameter into different bins and calculate the mean of the 
 % independent pRF parameter in the bins.
 %
@@ -15,14 +15,14 @@ x_Thr = xfit(2);
 % Divide the data into bins with required bin size and calculate the
 % mean values of the parameter in the bin
 
-
-bin_type = 'Eq_size';
 x_bin = struct();
 y_bin = struct();
 w_bin = struct();
-switch bin_type
+switch opt.binType
     %----- Binning with equal intervals -----%
     case {'Eq_interval'}
+        fprintf('binning with %s',opt.binType);
+        
         binsize = 0.5;
         x_ecc = (x_Thr_low:binsize:x_Thr)';
         i=1;
@@ -54,8 +54,10 @@ switch bin_type
     case {'Eq_size'}
         % ----- Binning with equal percentile of data in each bin ----- %
         
-        num_bin = 20;
-        bins = ceil(num_bin*tiedrank(x_param)./length(x_param));
+       num_bin = 20;
+       bins = ceil(num_bin*floor(tiedrank(x_param))./length(x_param));
+    
+        c=0;
         for idx_bin = 1:num_bin
             
             bii = (bins==idx_bin);
@@ -64,12 +66,25 @@ switch bin_type
             y_bin(idx_bin).data = y_param(bins==idx_bin);
             w_bin(idx_bin).data = w(bins==idx_bin);
             
-            % weighted mean of sigma
-            s = wstat(y_param(bii),w(bii));
-            % store
-            data.y(idx_bin) = s.mean;
-            data.ysterr(idx_bin) = s.sterr;
-            data.x(idx_bin) = mean(x_bin(idx_bin).data(:));
+            numItems_bin = sum(bii);
+            
+            if numItems_bin
+                % weighted mean of sigma
+                s = wstat(y_param(bii),w(bii));
+                % store
+                data.y(idx_bin) = s.mean;
+                data.ysterr(idx_bin) = s.sterr;
+                data.x(idx_bin) = mean(x_bin(idx_bin).data(:));
+            else
+                data.x(idx_bin) = mean(x_bin(idx_bin).data(:));
+                c = c+1;
+            end
+        end
+        
+        if c>0
+            idx_zero         = find(data.y==0);
+            data.y(idx_zero) = mean([data.y(idx_zero-1),data.y(idx_zero+1)],2); % if there
+            data.y_sterr(idx_zero) = mean([data.y_sterr(idx_zero-1),data.y_sterr(idx_zero+1)],2); % if there
         end
         
 end
