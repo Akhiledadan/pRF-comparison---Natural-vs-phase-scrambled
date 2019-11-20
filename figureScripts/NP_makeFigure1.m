@@ -32,9 +32,9 @@ for roi_idx = 1:numRoi
         plot(time, data.timeSeries_rois_thr{2,roi_idx}.tSeries(:,cur_vox),'o--','color',[0.7 0.7 0.7],'LineWidth',4,'markerSize',7);
         hold on;
 
-        plot(time, data.predictions_rois{1,roi_idx}(cur_vox,:),'color',[0.5 0.5 1],'LineWidth',4);
+        plot(time, data.predictions_rois_thr{1,roi_idx}(:,cur_vox),'color',[0.5 0.5 1],'LineWidth',4);
         hold on;
-        plot(time, data.predictions_rois{2,roi_idx}(cur_vox,:),'color',[0.5 1 0.5],'LineWidth',4);
+        plot(time, data.predictions_rois_thr{2,roi_idx}(:,cur_vox),'color',[0.5 1 0.5],'LineWidth',4);
         
         xlim(opt.xlimTS);
         ylim(opt.ylimTS);
@@ -49,9 +49,9 @@ for roi_idx = 1:numRoi
         s_cond2               = Cond_model{2,cur_roi}{1}.sigma(cur_vox);
         %---------------------
         
-        %txt_inPlot = sprintf('  x: %f, y: %f \n nat - variance explained: %f, sigma: %f \n scram - variance explained: %f, sigma: %f',x_cond,y_cond,ve_cond1,s_cond1,ve_cond2,s_cond2);
+        txt_inPlot = sprintf('  x: %f, y: %f \n nat - variance explained: %f, sigma: %f \n scram - variance explained: %f, sigma: %f',x_cond,y_cond,ve_cond1,s_cond1,ve_cond2,s_cond2);
         
-        %text(0.2,0.2,txt_inPlot,'Color',[0.2 0.2 0.2],'FontSize',15,'Units','normalized');
+        text(0.2,0.2,txt_inPlot,'Color',[0.2 0.2 0.2],'FontSize',15,'Units','normalized');
         
         xlabel('time (sec)');
         ylabel('% BOLD response');

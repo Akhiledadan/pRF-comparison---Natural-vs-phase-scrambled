@@ -22,7 +22,7 @@ for sub_idx = 1:numSub
     cd(NP_rootPath);
     %
     % % set options
-    opt = NP_getOpts(subjID,'MsPlot',0,'extractPrfParams',1);
+    opt = NP_getOpts(subjID,'MsPlot',0,'extractPrfParams',0,'plotTimeSeries',1,'getPredictedResponse',1);
     
     %% Get time series
     if opt.plotTimeSeries
@@ -133,8 +133,8 @@ for sub_idx = 1:numSub
                     
                     stim    = data.timeSeries_rois{1}.params.stim;
                     model   = Cond_model{cond_idx,cur_roi}{1};
-                    pred    = NP_getPredictedResponse(stim,model); % prediction = (stim*pRFModel)xBeta
-                    data.predictions_rois{cond_idx,roi_idx} = pred;
+                    pred    = NP_getPredictedResponse(stim,model,data,data.timeSeries_rois{1}.params); % prediction = (stim*pRFModel)xBeta
+                    data.predictions_rois_thr{cond_idx,roi_idx} = pred;
                 end
             end
         end
