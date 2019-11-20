@@ -13,39 +13,6 @@ sigma  = model.sigma;
 theta  = 0;
 x      = model.x;
 y      = model.y;
-gauss  = rfGaussian2d(X,Y,sigma,sigma,theta,x,y); % make the gaussian from the model
-beta   = model.beta;
-betaDC = model.betaDC;
-
-beta_all = [beta betaDC'];
-
-% first scale all the pRFs with their betas and then convolve it with the
-% stimulus
-old = 0;
-if old
-    pRFs         = gauss(stim.stimwindow,:);
-    pred_1       = pRFs' * stim.images;
-    
-    
-    % Calculate the prediction
-    trends     = ones(size(pred,2),1);
-    numVox     = size(pred,1);
-    prediction = nan(size(pred));
-    for vox = 1:numVox
-        pred         = conv(pred_1(vox,:),model.HRF{1});
-        prediction(vox,:) = [pred(vox,:)' trends(:,1)] * beta_all(vox,:)';
-    end
-end
-
-% pRFs         = gauss(stim.stimwindow,:);
-% scaledPrfs   = repmat(beta', [size(pRFs, 1) 1]) .* pRFs;
-% pred         = (scaledPrfs' * stim.images) + repmat(betaDC', [1 size(stim.images, 2)]);
-
-% save the predicted responses for loading later
-%pred   = (gauss(stim.stimwindow,:)' * stim.images) .* repmat(beta', [size(pRFs, 1) 1]);
-
-
-
 
 %% make predictions for each RF
 numVox = size(model.sigma,2);
