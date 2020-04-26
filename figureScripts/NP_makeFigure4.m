@@ -125,7 +125,10 @@ if opt.saveFig
     print(fH41, fullfile(saveDir,strcat(filename,'_fit_allrois')), '-depsc');
     
     if strcmpi(roi_comp,'LO2')
-        print(fH41, fullfile(dirPth.saveDirSup1,strcat(filename,'_fit_allrois')), '-depsc');
+        %print(fH41, fullfile(dirPth.saveDirSup1,strcat(filename,'_fit_allrois')), '-depsc');
+        pos = get(fH41,'Position');
+        set(fH41,'PaperPositionMode','Auto','PaperUnits','points','PaperSize',[pos(3),pos(4)]);
+        print(fH41, fullfile(dirPth.saveDirSup1,strcat(filename,'_fit_allrois')), '-dpdf');
     end
     
 end

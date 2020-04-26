@@ -26,7 +26,7 @@ opt.getTimeSeries         = false;
 opt.getPredictedResponse  = true;
   
 % --- prf parameters ---
-opt.rois = [{'V1';'V2';'V3'}]; % while changing rois here, change in NP_getOpts_all too. 
+opt.rois = [{'V1';'V2';'V3';'hV4';'LO1';'LO2'}]; % while changing rois here, change in NP_getOpts_all too. 
 opt.conditions = {'pRF_nat';'pRF_scram'};
 opt.modelType = '2DGaussian'; % DoGs for difference of gaussians 
 opt.plotType = 'Ecc_Sig';
@@ -52,7 +52,7 @@ opt.xlimTS = [0 380];
 opt.ylimTS = [-7 7];
 
 opt.ylimAuc = [-1 3];
-opt.ylimCen = [-0.05 0.2].*100;
+opt.ylimCen = [-0.2 0.3].*100;
 
 %% Check for extra inputs in case changing the default options
 if exist('varargin', 'var')

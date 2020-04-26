@@ -77,11 +77,12 @@ NP_runAll;
 %% Stats -  repeated measures ANOVA
 % parameters
 paramsToCompare      = 'central';
-paramsToCompare_type = 'absolute';
-rois = 'V123';
+paramsToCompare_type = 'original';
+rois = 'V1234LO';
         
 fprintf('parameter: %s \t type: %s \t rois: %s',paramsToCompare,paramsToCompare_type,rois);
 
 NP_stats(paramsToCompare,paramsToCompare_type,rois); 
+
 
 %%

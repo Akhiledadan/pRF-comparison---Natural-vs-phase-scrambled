@@ -1,6 +1,7 @@
 function NP_stats(paramsToCompare,paramsToCompare_type,rois,stats_folder)
 % NP_stats - repeated measures anova to compare auc or
-% central values of pRF size between different conditions for same subject
+% central values of pRF size between different conditions (eg: Natural and
+% phase scrambled natural images)
 
 % folder containing results
 if ~exist('stats_folder','var')
@@ -11,9 +12,8 @@ if ~exist('verbose','var')
     verbose = false;
 end
 
-% "absolute" - Used for the manuscript
-if strcmpi(paramsToCompare_type,'absolute') % If the absolute values are used for ANOVA. Difference between the means/std of two distribution are compared
-    
+% "original" - Used for the manuscript
+if strcmpi(paramsToCompare_type,'original') % Original central values of the two conditions are used for ANOVA
     if strcmpi(paramsToCompare,'central')
         filename_res = sprintf('central.mat');
         load(fullfile(stats_folder,filename_res));
@@ -36,17 +36,51 @@ if strcmpi(paramsToCompare_type,'absolute') % If the absolute values are used fo
             ranova(rm, 'WithinModel','condition*roi')
             
         case 'V123LO12'
-            t = table(cen.nat(:,1),cen.nat(:,2),cen.nat(:,3),cen.nat(:,4),cen.nat(:,5),cen.scram(:,1),cen.scram(:,2),cen.scram(:,3),cen.scram(:,4),cen.scram(:,5),...
+            t = table(cen.nat(:,1),cen.nat(:,2),cen.nat(:,3),cen.nat(:,4),cen.nat(:,5),...
+                cen.scram(:,1),cen.scram(:,2),cen.scram(:,3),cen.scram(:,4),cen.scram(:,5),...
                 'VariableNames',{'Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10'});
-            within = table({'nat';'nat';'nat';'nat';'nat';'scram';'scram';'scram';'scram';'scram'},{'V1';'V2';'V3';'LO1';'LO2';'V1';'V2';'V3';'LO1';'LO2';},...
+            
+            within = table({'nat';'nat';'nat';'nat';'nat';'scram';'scram';'scram';'scram';'scram'},...
+                {'V1';'V2';'V3';'LO1';'LO2';'V1';'V2';'V3';'LO1';'LO2';},...
                 'VariableNames',{'condition','roi'});
+            
             rm = fitrm(t,'Y1-Y10~1','WithinDesign',within);
+            
+            ranova(rm, 'WithinModel','condition*roi')
+            
+        case 'V1234LO'
+            t = table(cen.nat(:,1),cen.nat(:,2),cen.nat(:,3),cen.nat(:,4),cen.nat(:,5),...
+                cen.scram(:,1),cen.scram(:,2),cen.scram(:,3),cen.scram(:,4),cen.scram(:,5),...
+                'VariableNames',{'Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10'});
+            
+            within = table({'nat';'nat';'nat';'nat';'nat';'scram';'scram';'scram';'scram';'scram'},...
+                {'V1';'V2';'V3';'hV4';'LO';'V1';'V2';'V3';'hV4';'LO'},...
+                'VariableNames',{'condition','roi'});
+            
+            rm = fitrm(t,'Y1-Y10~1','WithinDesign',within);
+            
+            ranova(rm, 'WithinModel','condition*roi')
+            
+        case 'V1234LO12'
+            t = table(cen.nat(:,1),cen.nat(:,2),cen.nat(:,3),cen.nat(:,4),cen.nat(:,5),cen.nat(:,6),...
+                cen.scram(:,1),cen.scram(:,2),cen.scram(:,3),cen.scram(:,4),cen.scram(:,5),cen.scram(:,6),...
+                'VariableNames',{'Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10','Y11','Y12'});
+            
+            within = table({'nat';'nat';'nat';'nat';'nat';'nat';'scram';'scram';'scram';'scram';'scram';'scram'},...
+                {'V1';'V2';'V3';'hV4';'LO1';'LO2';'V1';'V2';'V3';'hV4';'LO1';'LO2'},...
+                'VariableNames',{'condition','roi'});
+            
+            rm = fitrm(t,'Y1-Y12~1','WithinDesign',within);
+            
             ranova(rm, 'WithinModel','condition*roi')
             
         case 'V123'
             t = table(cen.nat(:,1),cen.nat(:,2),cen.nat(:,3),cen.scram(:,1),cen.scram(:,2),cen.scram(:,3),'VariableNames',{'Y1','Y2','Y3','Y4','Y5','Y6'});
+            
             within = table({'nat';'nat';'nat';'scram';'scram';'scram'},{'V1';'V2';'V3';'V1';'V2';'V3';},'VariableNames',{'condition','roi'});
+            
             rm = fitrm(t,'Y1-Y6~1','WithinDesign',within);
+            
             ranova(rm, 'WithinModel','condition*roi')
             
             checkRoiDifference = 1;
@@ -86,7 +120,7 @@ if strcmpi(paramsToCompare_type,'absolute') % If the absolute values are used fo
     
     
     
-elseif strcmpi(paramsToCompare_type,'difference') % if the difference between the conditions are used for the ANOVA. Mean/std of the difference of the absolute values are compared
+elseif strcmpi(paramsToCompare_type,'relative difference') % if the difference between the conditions are used for the ANOVA. Mean/std of the difference of the absolute values are compared
     
     if strcmpi(paramsToCompare,'central')
         filename_res = sprintf('central.mat');
@@ -119,7 +153,20 @@ elseif strcmpi(paramsToCompare_type,'difference') % if the difference between th
             rm = fitrm(t,'Y1-Y3~1','WithinDesign',within);
             ranova(rm, 'WithinModel','roi')
             
-            [~,p]=ttest(D(:,1),D(:,3)); % V1 vs V3
+            fprintf('V1 and V2 \n');
+            [~,p,~,stats]=ttest(D(:,1),D(:,2)) % V1 vs V2
+            fprintf('V1 and V3 \n');
+            [~,p,~,stats]=ttest(D(:,1),D(:,3)) % V1 vs V3
+            fprintf('V2 and V3 \n');
+            [~,p,~,stats]=ttest(D(:,2),D(:,3)) % V2 vs V3
+            
+            % V1 , V2 , V3
+            fprintf('V1 \n');
+            [~,p,~,stats]=ttest(D(:,1)) % V1
+            fprintf('V2 \n');
+            [~,p,~,stats]=ttest(D(:,2)) % V2
+            fprintf('V3 \n');
+            [~,p,~,stats]=ttest(D(:,3)) % V3
             
     end
     

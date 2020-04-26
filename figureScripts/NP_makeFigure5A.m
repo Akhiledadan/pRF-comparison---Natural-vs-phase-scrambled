@@ -33,8 +33,10 @@ if opt.saveFig
         
     figName(regexp(figName,' ')) = '_';
     filename = figName;
-    print(fH5A, fullfile(saveDir,strcat(filename,'_cen_diff')), '-depsc');
-    print(fH5A, fullfile(dirPth.saveDirSup2,strcat(filename,'_cen_diff')), '-depsc');
+%    print(fH5A, fullfile(saveDir,strcat(filename,'_cen_diff')), '-depsc');
+    pos = get(fH5A,'Position');
+    set(fH5A,'PaperPositionMode','Auto','PaperUnits','points','PaperSize',[pos(3),pos(4)]);
+    print(fH5A, fullfile(dirPth.saveDirSup2,strcat(filename,'_cen_diff')), '-dpdf');
     
 end
 

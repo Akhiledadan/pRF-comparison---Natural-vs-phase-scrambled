@@ -67,7 +67,7 @@ ylabel('pRF size (deg)');
 legend({'natural image','phase scrambled natural image'});
 set(gca,'FontName','Helvetica','FontUnits','centimeters', 'FontSize', 1.1, 'TickDir','out','LineWidth',3); box off
 hold off;
-set(gca,'XTickLabel',opt.rois,'YTick',0:2);
+set(gca,'XTickLabel',opt.rois,'YTick',0:3);
 
 if opt.saveFig
     saveDir = fullfile(dirPth.saveDirMSFig,'figure6');
@@ -77,7 +77,10 @@ if opt.saveFig
         
     figName(regexp(figName,' ')) = '_';
     filename = figName;    
-    print(fH7, fullfile(saveDir,strcat(filename,'_cen_allsub')), '-depsc2');
+%    print(fH7, fullfile(saveDir,strcat(filename,'_cen_allsub')), '-depsc2');
+    pos = get(fH7,'Position');
+    set(fH7,'PaperPositionMode','Auto','PaperUnits','points','PaperSize',[pos(3),pos(4)]);
+    print(fH7, fullfile(saveDir,strcat(filename,'_cen_allsub')), '-dpdf');
 end
 
 
@@ -133,10 +136,14 @@ if opt.saveFig
         
     figName(regexp(figName,' ')) = '_';
     filename = figName;
-    print(fH71, fullfile(saveDir,strcat(filename,'_cen_diff_allsub')), '-depsc');
-    print(fH72, fullfile(saveDir,strcat(filename,'_rel_cen_diff_allsub')), '-depsc');
+    %print(fH71, fullfile(saveDir,strcat(filename,'_cen_diff_allsub')), '-depsc');
+    %print(fH72, fullfile(saveDir,strcat(filename,'_rel_cen_diff_allsub')), '-depsc');
     
-    print(fH72, fullfile(dirPth.saveDirSup3,strcat(filename,'_rel_cen_diff_allsub')), '-depsc');
+    %print(fH72, fullfile(dirPth.saveDirSup3,strcat(filename,'_rel_cen_diff_allsub')), '-depsc');
+    
+    pos = get(fH71,'Position');
+    set(fH71,'PaperPositionMode','Auto','PaperUnits','points','PaperSize',[pos(3),pos(4)]);
+    print(fH71, fullfile(saveDir,strcat(filename,'_cen_diff_allsub')), '-dpdf');
 end
 
 

@@ -27,7 +27,7 @@ for voxel = 1:numVox
     
     [trends, ntrends, dcid] = rmMakeTrends(params, 0);
     
-    beta                    = pinv([pred trends(:,dcid)])*data.timeSeries_rois_thr{1}.tSeries(:,voxel); % recomputing the beta values
+    beta                    = pinv([pred trends(:,dcid)])*data.tSeries(:,voxel); % recomputing the beta values
     beta(1)                 = max(beta(1),0);
     
     % Calculate the prediction

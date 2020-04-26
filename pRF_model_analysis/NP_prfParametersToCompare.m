@@ -22,7 +22,7 @@ function [params_comp,opt] = NP_prfParametersToCompare(Cond_model,cur_roi,opt)
             
             % Axis limits for plotting
             xaxislim = [0 5];
-            yaxislim = [0 2.5];
+            yaxislim = [0 6 ];
             
             % x range values for fitting
             xfit_range = opt.eccThr;

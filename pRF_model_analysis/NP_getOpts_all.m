@@ -20,7 +20,7 @@ opt.saveAucDiff           = 1;
 opt.saveCenDiff           = 1;
 
 % --- prf parameters ---
-opt.rois = [{'V1';'V2';'V3';'LO'}];
+opt.rois = [{'V1';'V2';'V3';'hV4';'LO1';'LO2'}];
 opt.conditions = {'pRF_nat';'pRF_scram'};
 opt.modelType = '2DGaussian'; % DoGs for difference of gaussians 
 opt.plotType = 'Ecc_Sig';
@@ -44,9 +44,9 @@ opt.AUC = true;
 
 opt.ylimAuc = [-1 3];
 opt.xlimCen = [0 length(opt.rois)+1];
-opt.ylimCen = [0 2];
+opt.ylimCen = [0 3.5];
 opt.ylimCenDiff = [-0.05 0.5];
-opt.ylimCenRelDiff = [0 0.11].*100;
+opt.ylimCenRelDiff = [-0.01 0.11].*100;
 
 %% Check for extra inputs in case changing the default options
 if exist('varargin', 'var')
